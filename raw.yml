@@ -1,0 +1,70 @@
+- hosts: all
+  gather_facts: false
+  become: yes
+  tasks:
+  - name: raw module
+    raw: pwd && ls
+    become: yes
+  - name: installation with raw
+    raw: apt-get -y install python-simplejson
+  - name: installing nginx
+    shell: apt-get update
+    become: yes
+  - name: installing nginx
+    shell: apt-get install nginx -y
+    become: yes
+#  - name: file permission change
+#    file:
+#      path: /var/www/html/some.txt
+#      state: file
+#      mode: 0777
+  - name: shell practice Change the working directory to /usr/share/html/ before executing the command.
+    shell: cat index.nginx-debian.html >> some.txt
+    args:
+      chdir: /var/www/html/
+    become: yes
+  - name: creates -- a filename, when it already exists, this step will not be run.
+    shell: cat index.nginx-debian.html >> some.txt
+    args:
+      chdir: /var/www/html/
+      creates: some.txt
+  - name: executable--change the shell used to execute the command. Should be an absolute path to the executable.
+    shell: cat < /var/www/html/some.txt
+    args:
+      executable: /bin/bash
+  - name: editing index.html
+    shell: echo "HI Pavan" > /var/www/html/index.nginx-debian.html
+    notify: 
+    - restart nginx
+  - name: file symlink
+    file:
+      src: /etc/nginx/sites-available/default
+      dest: /etc/nginx/sites-enabled/default
+      state: link
+  - name: file modes
+    file:
+      path: /var/www/html/a
+      state: touch
+      force: yes
+      mode: "u=rwx,g=r,o=r" # 0744
+  - name: file mode change
+    file:
+      path: /var/www/html/x
+      state: touch
+      force: yes
+      mode: "u+rwx,g+rwx,o+rwx"
+  - name: dynamic symlink  file creation
+    file:
+      src: '/var/www/html/{{ item.src }}'
+      dest: '/tmp/{{ item.dest }}'
+      state: link
+    with_items:
+      - { src: 'x', dest: 'y.txt'}
+      - { src: 'a', dest: 'b.txt'} 
+  handlers:
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
+#  - name: Run a command using a templated variable
+#    shell: cat {{ /usr/share/nginx/html/some.txt|quote }}
