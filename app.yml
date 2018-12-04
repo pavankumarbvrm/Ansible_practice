@@ -1,0 +1,26 @@
+- hosts: all
+  gather_facts: false
+  become: true
+  vars:
+  - msg: "welcome all"
+  pre_tasks:
+  - name: install python
+    raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+  tasks:
+  - name: add nginx repo
+    apt_repository: repo='ppa:nginx/stable' state=present
+    register: ppastable
+  - name: nginx install
+    apt: pkg=nginx state=present update_cache=true
+    when: ppastable is success
+    register: nginxinstallstatus
+    notify:
+      - start nginx   
+  - name: index.html copy
+    when: nginxinstallstatus is success
+    template: src=index.html.j2 dest=/var/www/html/index.nginx-debian.html
+    notify:
+      - start nginx  
+  handlers:
+    - name: start nginx
+      service: name=nginx state=started 
