@@ -1,0 +1,51 @@
+- hosts: all
+  gather_facts: false
+  become: yes
+
+  tasks:
+  - name: Update repositories cache and install "foo" package
+    apt:
+      name: linux-tools-generic
+      update_cache: yes    #"apt-get update"
+  - name: Install apache httpd but avoid starting it immediately (state=present is optional) apt starts newly installed services by default, this is what the underlying tooling does, to avoid this you can set the RUNLEVEL environment variable to 1.
+    apt:
+      name: lynx
+    environment:
+      RUNLEVEL: 1
+  - name: Remove "foo" package
+    apt:
+      name: linux-tools-generic
+      state: absent
+  - name: Install a list of packages
+    apt:
+      name: "{{ packages }}" 
+      state: present
+      install_recommends: no
+    vars:
+      packages:
+      - linux-tools-generic
+      - wireless-tools
+      - aptitude
+  - name: Upgrade all packages to the latest version, Use the apt module to install aptitude before running the upgrade.
+    apt:
+      name: "*"
+      state: latest
+  - name: Update all packages to the latest version
+    apt:
+      upgrade: dist
+  - name: copy .deb
+    copy:
+      src: /tmp/dkopp-7.1-x86_64.deb
+      dest: /tmp/dkopp-7.1-x86_64.deb
+  - name: Install a .deb package
+    apt:
+      deb: /tmp/dkopp-7.1-x86_64.deb
+  - name: Install a .deb package from the internet
+    apt: 
+      deb: http://archive.ubuntu.com/ubuntu/pool/universe/n/nltk/python3-nltk_3.1-1_all.deb
+  - name: Remove useless packages from the cache
+    apt:
+      autoclean: yes
+  - name: Remove dependencies that are no longer required
+    apt: 
+      autoremove: yes
