@@ -26,4 +26,4 @@
   register: ntp_status_on_Debian
   become: true
 - debug:
-  var: ntp_status_on_Debian
+    var: ntp_status_on_Debian
