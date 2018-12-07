@@ -1,2 +1,11 @@
 ---
 # tasks file for webserver
+- name: installing apache2
+  apt: name=apache2 state=latest
+  become: true
+  notify:
+    restart_apache2
+- name: change cofig at /var/www/html/index.html
+  template: src=index.html.j2 dest=/var/www/html/index.html
+  notify:
+    restart_apache2  
