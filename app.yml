@@ -6,10 +6,23 @@
   pre_tasks:
   - name: install python
     raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+    tags: run2
   tasks:
   - name: add nginx repo
     apt_repository: repo='ppa:nginx/stable' state=present
     register: ppastable
+    tags: [run, run2]
+  - name: debug
+    debug:
+      var: ppastable
+    tags: run
+  - name: debug
+    debug:
+      msg: "ppastate {{ ppastable.state }}"
+#  - name: debug with when
+#    debug:
+#      msg: "ppastate {{ ppastable.state }}"
+#      when: ppastable.failed is true
   - name: nginx install
     apt: pkg=nginx state=present update_cache=true
     when: ppastable is success
