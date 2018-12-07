@@ -1,16 +1,21 @@
 ---
 # tasks file for common
-- name: Add OS specific variables
-  include_vars: '{{ ansible_os_family }}.yml'
+#- name: Add OS specific variables
+#  include_vars: '{{ ansible_os_family }}.yml'
 
 - name: install NTP
   yum: name=ntp state={{ ntp_status }}
   when: ansible_os_family == 'RedHat'
-  debug:
+  register: ntp_status
+- debug:
     var: ntp_status
+- name: update cache
+  apt:  
+    update_cache: yes
+  when: ansible_os_family == 'Debian'
+  become: true
+- name: install NTP on ubunut
+  apt: name=ntp state=latest
+  when: ansible_os_family == 'Debian' 
+  become: true 
 
-- name: install NTP
-  yum: name=ntp state={{ ntp_status }}
-  when: ansible_os_family == 'Ubuntu' and ansible_distribution_version == '16.04'
-  debug:
-    var: ntp_status

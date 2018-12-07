@@ -1,22 +1,23 @@
 ---
 - hosts: all
+  gather_facts: true
   roles:
   - common
 
-- hosts: dbserver
-  roles:
-  - db
+#- hosts: dbserver
+#  roles:
+#  - db
 
-- hosts: webserver
-  roles:
-  - web
-  - base-apache
+#- hosts: webserver
+#  roles:
+#  - web
+#  - base-apache
 
-- hosts: lbserver
-  roles:
-  - haproxy
+#- hosts: lbserver
+#  roles:
+#  - haproxy
 
-- hosts: monitoring
-  roles:
-  - base-apache
-  - nagios
+#- hosts: monitoring
+#  roles:
+#  - base-apache
+#  - nagios
