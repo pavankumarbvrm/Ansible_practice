@@ -3,19 +3,27 @@
 #- name: Add OS specific variables
 #  include_vars: '{{ ansible_os_family }}.yml'
 
-- name: install NTP
+- name: update cache on RedHat
+  yum:  
+    update_cache: yes
+  when: ansible_os_family == 'RedHat'
+  become: true
+- name: install NTP on RedHat
   yum: name=ntp state={{ ntp_status }}
   when: ansible_os_family == 'RedHat'
-  register: ntp_status
+  register: ntp_status_on_RedHat
+  become: true
 - debug:
-    var: ntp_status
-- name: update cache
+    var: ntp_status_on_RedHat
+- name: update cache on Debian
   apt:  
     update_cache: yes
   when: ansible_os_family == 'Debian'
   become: true
-- name: install NTP on ubunut
-  apt: name=ntp state=latest
+- name: install NTP on Debian
+  apt: name=ntp state={{ ntp_status }}
   when: ansible_os_family == 'Debian' 
-  become: true 
-
+  register: ntp_status_on_Debian
+  become: true
+- debug:
+  var: ntp_status_on_Debian
