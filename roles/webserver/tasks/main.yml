@@ -18,3 +18,18 @@
   become: true
   notify:
     restart_apache2  
+- name: template loop example
+  template: src=example2.j2 dest=/var/www/html/index3.html
+  become: true
+  notify:
+    restart_apache2
+- name: template loop example
+  template: 
+    src: "{{ item.src }}" 
+    dest: "{{ item.dest }}"
+  with_items:
+    - {src: 'exam.j2', dest: /var/www/html/exam.html}
+    - {src: 'exam1.j2', dest: /var/www/html/exam1.html}
+  become: true
+  notify:
+    restart_apache2

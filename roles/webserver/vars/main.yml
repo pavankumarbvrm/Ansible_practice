@@ -1,3 +1,6 @@
 ---
 variable1: 'Hello...!!!'
 variable2: 'My first playbook using template'
+list1: ['Apple','Banana','Cat', 'Dog']
+exam_var: 'exam-variables from var with_item'
+exam2_var: 'exam2-variables from var with_item'
