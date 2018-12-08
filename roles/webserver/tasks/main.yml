@@ -8,8 +8,9 @@
 - name: file creation index2.html
   file: path=/var/www/html/index2.html state=touch mode="u=rwx,g=rwx,o=rwx"
   become: true
-- name: change cofig at /var/www/html/index2.html
+- name: change cofig at /var/www/html/index2.html. Create a backup file including the timestamp information so you can get the original file back if you somehow clobbered it incorrectly.
   copy: src=index2.html dest=/var/www/html/index2.html
+  backup: yes
   become: true
 - name: Basic Template Example
   template:
@@ -17,7 +18,12 @@
     dest: /var/www/html/index.html
   become: true
   notify:
-    restart_apache2  
+    restart_apache2
+- name:This module works like copy, but in reverse. It is used for fetching files from remote machines and storing them locally in a file tree, organized by hostname.
+  fetch:
+    src: /var/www/html/index.html
+    dest: /tmp/prefix-{{ inventory_hostname }}
+    flat: yes
 - name: template loop example
   template: src=example2.j2 dest=/var/www/html/index3.html
   become: true
