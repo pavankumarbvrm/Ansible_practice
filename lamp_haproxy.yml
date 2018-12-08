@@ -1,16 +1,17 @@
 ---
-- hosts: all
-  gather_facts: true
-  roles:
-  - common
+#- hosts: all
+#  gather_facts: true
+#  roles:
+#  - common
 
 #- hosts: dbserver
 #  roles:
 #  - db
 
-#- hosts: webserver
-#  roles:
-#  - web
+- hosts: webserver
+  roles:
+  - webserver
+  tags: web
 #  - base-apache
 
 #- hosts: lbserver
