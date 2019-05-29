@@ -1,0 +1,5 @@
+---
+- name: Get Device Facts
+  hosts: all
+  roles:
+    - lamp

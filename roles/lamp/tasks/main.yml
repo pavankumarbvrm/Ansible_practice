@@ -1,0 +1,21 @@
+---
+- name: install php
+  apt: name={{item}} state=latest update_cache=yes
+  with_items:
+  - php7.0-cli
+  - php7.0-mysql
+  - mysql-server
+  - mysql-client
+  - nginx
+  become: true
+- name: copy index.htnl & css and notify nginx restart
+  copy: src=/home/vagrant/Ansible_practice/roles/lamp/index.html  dest=/var/www/html/index.html
+- name: copy css 
+  copy: src=/home/vagrant/Ansible_practice/roles/lamp/style.css  dest=/var/www/html/style.css
+#  notify:
+#    - name: restart services
+#  handlers:
+#  - name: restart services
+#    service: name={{item}} state=restarted
+#    with_items:
+#      - nginx
