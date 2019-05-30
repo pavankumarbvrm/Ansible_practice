@@ -1,0 +1,94 @@
+---
+# tasks file for apt-module
+
+#If you have a large playbook, it may become useful to be able to run only a specific part of it rather than running everything in the playbook. Ansible supports a “tags:” attribute for this reason.
+
+#When you execute a playbook, you can filter tasks based on tags in two ways:
+
+#On the command line, with the --tags or --skip-tags options
+#In Ansible configuration settings, with the TAGS_RUN and TAGS_SKIP options
+
+#There are another 3 special keywords for tags: tagged, untagged and all, which run only tagged, only untagged and all tasks respectively.
+#There is a special always tag that will always run a task, unless specifically skipped (--skip-tags always)
+#You can see which tags are applied to tasks, roles, and static imports by running ansible-playbook with the --list-tasks option. You can display all tags applied to the tasks with the --list-tags option.
+
+#debug module prints statements during execution and can be useful for debugging variables or expressions without necessarily halting the playbook.
+#Useful for debugging together with the 'when:' directive.
+
+- name: Update repositories cache, Install apache httpd but avoid starting it immediately (state=present is optional), apt starts newly installed services by default, this is what the underlying tooling does, to avoid this you can set the RUNLEVEL environment variable to 1.
+  apt: name=apache2-bin update_cache=yes state=present
+  environment: runlevel=1
+  tags:
+  - start_up
+- name: Remove "foo" package
+  apt: name=vim state=absent
+
+- name: Install a list of packages
+  apt: name={{item}} state=present
+  with_items:
+    - nano
+    - lynx
+
+- name: Install the version '1.00' of package "foo"
+  apt: name=tree=1.7.0-3 state=present update_cache=yes
+  tags:
+  - version
+
+- name: Install latest version of "openjdk-8-jdk" ignoring "install-recommends"
+  apt: name=openjdk-8-jdk state=latest install_recommends=no
+  tags:
+  - openjdk-8-jdk
+
+- name: Upgrade all packages to the latest version
+  apt: name="*" state=latest
+  tags:
+  - [ update, basic ]
+
+#- name: Update all packages to the latest version
+#  apt: upgrade= dist
+#   tags:
+#   - update
+
+- name: Only run "update_cache=yes" if the last one is more than 3600 seconds ago
+  apt: update_cache=yes cache_valid_time=3600
+  tags:
+  - update
+
+- name: Pass options to dpkg on run
+  apt: upgrade=dist update_cache=yes dpkg_options='force-confold,force-confdef'
+  tags:
+  - dpkg
+- name: Install the build dependencies for package "foo"
+  apt: pkg=openjdk-8-jdk state=build-dep
+  tags:
+  - openjdk-8-jdk
+
+- name: Install a .deb package from the internet.
+  apt: deb=http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/openssl_1.0.2g-1ubuntu4.15_amd64.deb
+  tags:
+  - internet
+- name: Check uptime
+  shell: /usr/bin/uptime
+  register: result
+  tags:
+  - debug
+- name: debug
+  debug: msg= uptime is "{{result.stdout}}"
+  tags:
+  - debug
+- name: Check Ansible version
+  command: nginx -V
+  register: pythonVersion
+  tags:
+  - debug
+- name: Print version
+  debug:
+    msg: "python Version: {{ pythonVersion.stdout }}"
+  tags:
+  - debug 
+- name: Remove useless packages from the cache
+  apt: autoclean=yes
+- name: Remove dependencies that are no longer required
+  apt: autoremove=yes
+
+

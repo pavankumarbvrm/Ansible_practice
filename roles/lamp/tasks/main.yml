@@ -10,8 +10,11 @@
   become: true
 - name: copy index.htnl & css and notify nginx restart
   copy: src=/home/vagrant/Ansible_practice/roles/lamp/index.html  dest=/var/www/html/index.html
+  become: true
 - name: copy css 
   copy: src=/home/vagrant/Ansible_practice/roles/lamp/style.css  dest=/var/www/html/style.css
+- name: service restart
+  service: name=nginx state=restarted
 #  notify:
 #    - name: restart services
 #  handlers:
