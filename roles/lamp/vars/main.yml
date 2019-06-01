@@ -1,2 +1,4 @@
 ---
 # vars file for lamp
+nginx_version: "1.12.0"
+msg_to_j2: This is injected from vars main.yml file

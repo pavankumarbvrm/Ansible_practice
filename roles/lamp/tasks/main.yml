@@ -1,24 +1,39 @@
 ---
-- name: install php
-  apt: name={{item}} state=latest update_cache=yes
-  with_items:
-  - php7.0-cli
-  - php7.0-mysql
-  - mysql-server
-  - mysql-client
-  - nginx
+- name: install gcc
+  apt: name=gcc state=present update_cache=yes
+- name: install build-essential
+  apt: name=build-essential state=present 
+- name: download nginx 1.12.2
+  get_url: url=http://nginx.org/download/nginx-{{ nginx_version }}.tar.gz dest=/tmp/nginx-{{ nginx_version }}.tar.gz
+
+- name: Extract tar.gz file
+  unarchive: src=/tmp/nginx-{{ nginx_version }}.tar.gz dest=/home/ubuntu/
+    remote_src=yes
+- name: install nginx normally
+  apt: name=nginx state=latest
+
+- name: runinng the configure file
+  command: ./configure 
+  args:
+    chdir: /home/ubuntu/nginx-{{ nginx_version }}/
+- name: running make
+  make: 
+    chdir: /home/ubuntu/nginx-{{ nginx_version }}/
+- name: running make install
+  make: 
+    chdir: /home/ubuntu/nginx-{{ nginx_version }}/
+    target: install
   become: true
-- name: copy index.htnl & css and notify nginx restart
-  copy: src=/home/vagrant/Ansible_practice/roles/lamp/index.html  dest=/var/www/html/index.html
-  become: true
-- name: copy css 
-  copy: src=/home/vagrant/Ansible_practice/roles/lamp/style.css  dest=/var/www/html/style.css
-- name: service restart
-  service: name=nginx state=restarted
-#  notify:
-#    - name: restart services
-#  handlers:
-#  - name: restart services
-#    service: name={{item}} state=restarted
-#    with_items:
-#      - nginx
+  register: result
+
+- name: copy index file
+  template: src=index.html.j2 dest=/var/www/html/index.html
+  tags:
+  - run
+
+- name: copy index file
+  copy: src=/home/vagrant/Ansible_practice/roles/lamp/files/style.css dest=/var/www/html/style.css
+  notify: restart nginx
+  tags:
+  - run
+
