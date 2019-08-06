@@ -4,6 +4,7 @@
   gather_facts: false
   become: true
   roles:
-    - lamp
+#    - lamp
 #    - apt-module
-#    - modules 
+#    - modules
+     - mysql 

@@ -1,0 +1,35 @@
+---
+# tasks file for mysql
+- name: install mysql
+  apt: name={{ item }} state=latest update_cache=yes
+  with_items:
+  - python-minimal
+  - python-mysqldb
+  - python-pip 
+  - mysql-server
+  - mysql-client
+  - build-essential
+  - libmysqlclient-dev 
+
+- name: install mysql with pip
+  pip: name=MySQL-python state=present
+
+- name: remove SQL test DB
+  mysql_db: name=test state=absent
+
+- name: Create databases
+  mysql_db: name=news-db state=present collation=utf8_general_ci encoding=utf8
+  tags:
+  - mysql
+- name: Add deploy DB user and allow access to news_* databases
+  mysql_user: name=sql_user1 password= {{ mysql_user_password }} priv='*.*:ALL,GRANT' host_all=yes  state=present 
+  tags:
+  - mysql
+- name: Set root password
+  mysql_user: name=root1 password= {{mysql_root_password}} priv='*.*:ALL,GRANT' host_all=yes state=present
+  tags:
+  - mysql
+- name: Restart the MySQL service
+  service: name=mysql state=restarted enabled=true
+  tags:
+  - mysql

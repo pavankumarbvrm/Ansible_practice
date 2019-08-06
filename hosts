@@ -1,5 +1,5 @@
 [all]
-3.87.214.216
+35.174.165.14
 [all:vars]
 ansible_user=ubuntu
 ansible_ssh_private_key_file=/home/vagrant/Ansible_practice/thazeem-aws.pem
